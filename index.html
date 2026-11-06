@@ -202,6 +202,63 @@
         color: transparent;
       }
 
+      .ad-slot {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 1.25rem;
+        border: 1px dashed oklch(var(--background-700) / 0.9);
+        background-color: oklch(var(--background-900) / 0.4);
+        background-image: repeating-linear-gradient(
+          135deg,
+          oklch(var(--foreground-50) / 0.02) 0 10px,
+          transparent 10px 20px
+        );
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .ad-slot-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem 0.85rem;
+        min-height: 90px;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      .ad-slot-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border-radius: 999px;
+        border: 1px solid oklch(var(--background-700) / 0.8);
+        background-color: oklch(var(--background-800) / 0.7);
+        padding: 0.2rem 0.6rem;
+        font-family: var(--font-label);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: oklch(var(--foreground-500));
+        white-space: nowrap;
+      }
+
+      .ad-slot-copy {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: oklch(var(--foreground-500));
+        white-space: nowrap;
+      }
+
+      .ad-slot-hint {
+        display: none;
+        font-size: 10px;
+        color: oklch(var(--foreground-700));
+      }
+
       .aurora {
         background-image:
           radial-gradient(48% 55% at 50% -6%, oklch(var(--primary-500) / 0.28) 0%, transparent 68%),
@@ -485,6 +542,14 @@
 
       <section id="mailbox" class="relative w-full pb-16 pt-2 md:pb-24">
         <div class="mx-auto w-full max-w-4xl px-4 md:px-6">
+          <div class="ad-slot mb-4 md:mb-5" data-ad-slot="inbox-top" aria-label="Advertisement">
+            <div class="ad-slot-inner">
+              <span class="ad-slot-tag"><i class="ri-advertisement-line"></i>Ad Space</span>
+              <span class="ad-slot-copy">Google AdSense · 728 × 90</span>
+              <span class="ad-slot-hint">Paste your AdSense unit here</span>
+            </div>
+          </div>
+
           <div class="glass-card flex min-w-0 flex-col overflow-hidden">
             <div class="border-b border-background-800/70 p-4 md:p-5">
               <div class="flex flex-wrap items-center justify-between gap-3">
@@ -499,8 +564,8 @@
                     id="preview-badge"
                     class="hidden items-center gap-1.5 rounded-full border border-accent-500/30 bg-accent-500/10 px-2.5 py-1 font-label text-[10px] font-semibold uppercase tracking-[0.14em] text-accent-300 sm:inline-flex"
                   >
-                    <i class="ri-flask-line"></i>
-                    Demo inbox
+                    <i class="ri-inbox-archive-line"></i>
+                    Local inbox
                   </span>
                 </div>
 
@@ -563,10 +628,18 @@
             </div>
           </div>
 
+          <div class="ad-slot mt-4 md:mt-5" data-ad-slot="inbox-bottom" aria-label="Advertisement">
+            <div class="ad-slot-inner">
+              <span class="ad-slot-tag"><i class="ri-advertisement-line"></i>Ad Space</span>
+              <span class="ad-slot-copy">Google AdSense · 728 × 90</span>
+              <span class="ad-slot-hint">Paste your AdSense unit here</span>
+            </div>
+          </div>
+
           <p class="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11px] text-foreground-600">
             <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
-              <i class="ri-flask-line"></i>
-              Messages are generated locally for this demo
+              <i class="ri-inbox-line"></i>
+              Inbox starts empty — no sample mail
             </span>
             <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
               <i class="ri-user-unfollow-line"></i>
@@ -677,67 +750,12 @@
         }
 
         /**
-         * A deterministic release schedule is produced for every address, so the
-         * inbox fills up on its own while the visitor is watching.
+         * No scheduled or demo mail is produced for any address.
+         * The inbox starts empty and only ever shows mail that is actually
+         * delivered to the address — nothing is generated locally.
          */
-        function planFor(session) {
-          var base = session.createdAt || Date.now();
-          var address = session.address;
-          var codeA = randomDigits(6);
-          var codeB = randomDigits(6);
-          var codeC = randomDigits(4);
-
-          return [
-            {
-              at: base,
-              from: 'NexaTemp Studio <hello@nexatemp.pro>',
-              subject: 'Your disposable inbox is ready',
-              excerpt: 'This inbox refreshes automatically every ten seconds and detects verification codes for you.',
-              body:
-                '<div><h2>Your inbox is live</h2><p>Mail sent to <strong>' +
-                escapeHtml(address) +
-                '</strong> lands right here, inside this browser tab.</p><ul><li>Click the address to copy it instantly.</li><li>Verification codes are detected and highlighted automatically.</li><li>Switch domains whenever a site refuses one.</li></ul><p>— NexaTemp Studio</p></div>'
-            },
-            {
-              at: base + 9000,
-              from: 'Lexica Support <no-reply@lexica.art>',
-              subject: 'Your Lexica verification code',
-              excerpt: 'Use code ' + codeA + ' to finish signing in. The code expires in 10 minutes.',
-              body:
-                '<div><h2>Confirm your sign-in</h2><p>Enter the code below to finish signing in to your Lexica account.</p><p style="font-family:monospace;font-size:26px;letter-spacing:8px;font-weight:600;color:#a7f3d0;">' +
-                codeA +
-                '</p><p>This code expires in 10 minutes. If you did not request it, you can safely ignore this email.</p></div>'
-            },
-            {
-              at: base + 21000,
-              from: 'Harbor Cloud <security@harborcloud.io>',
-              subject: 'Security code: ' + codeB,
-              excerpt: 'Your one-time security code is ' + codeB + '. It stays valid for 5 minutes.',
-              body:
-                '<div><h2>One-time security code</h2><p>A sign-in attempt needs confirmation. Use the code below to continue.</p><p style="font-family:monospace;font-size:26px;letter-spacing:8px;font-weight:600;color:#fde68a;">' +
-                codeB +
-                '</p><p>Valid for 5 minutes.</p></div>'
-            },
-            {
-              at: base + 38000,
-              from: 'NexaTemp Studio <digest@nexatemp.pro>',
-              subject: 'Two tips for a faster inbox',
-              excerpt: 'Rotate your address between signups and keep this tab open so auto-refresh stays active.',
-              read: true,
-              body:
-                '<div><h2>Two small tips</h2><p><strong>Rotate often.</strong> A fresh address keeps marketing mail away from your real inbox.</p><p><strong>Keep this tab open.</strong> Auto-refresh picks up again as soon as you return to it.</p></div>'
-            },
-            {
-              at: base + 62000,
-              from: 'Portal Security <alerts@portal.dev>',
-              subject: 'Your one-time passcode',
-              excerpt: 'Passcode ' + codeC + ' expires in 3 minutes.',
-              body:
-                '<div><h2>Your passcode</h2><p>Enter this passcode to continue:</p><p style="font-family:monospace;font-size:22px;letter-spacing:6px;font-weight:600;color:#a7f3d0;">' +
-                codeC +
-                '</p><p>Expires in 3 minutes.</p></div>'
-            }
-          ];
+        function planFor() {
+          return [];
         }
 
         /* ------------------------------------------------------------------ *
@@ -745,7 +763,7 @@
          * ------------------------------------------------------------------ */
 
         var KEYWORD_PATTERN = /(?:otp|one[-\s]?time|verification|verify|confirmation|security|passcode|access\s*code|login\s*code|authentication|code|pin|token)\D{0,24}?(\d{4,8})/i;
-        var STANDALONE_PATTERN = /(?<!\d)(\d{4,8})(?!\d)/g;
+        var STANDALONE_PATTERN = /\b(\d{4,8})\b/g;
 
         function htmlToText(value) {
           var raw = asText(value);
@@ -818,39 +836,51 @@
             return '<p>' + escapeHtml(html) + '</p>';
           }
 
-          Array.prototype.forEach.call(doc.querySelectorAll(BLOCKED_TAGS.join(',')), function (node) {
-            node.parentNode.removeChild(node);
-          });
+          try {
+            Array.prototype.forEach.call(doc.querySelectorAll(BLOCKED_TAGS.join(',')), function (node) {
+              if (node.parentNode) node.parentNode.removeChild(node);
+            });
 
-          Array.prototype.forEach.call(doc.querySelectorAll('*'), function (element) {
-            Array.prototype.forEach.call(element.attributes.slice(), function (attribute) {
-              var name = attribute.name.toLowerCase();
-              var value = attribute.value.trim().toLowerCase();
+            Array.prototype.forEach.call(doc.querySelectorAll('*'), function (element) {
+              var snapshot = [];
+              var attributes = element.attributes;
+              var index;
 
-              if (name.indexOf('on') === 0 || name === 'srcdoc' || name === 'formaction') {
-                element.removeAttribute(attribute.name);
-                return;
+              for (index = 0; index < attributes.length; index += 1) {
+                snapshot.push({ name: attributes[index].name, value: attributes[index].value });
               }
 
-              var isLink = name === 'href' || name === 'src' || name === 'xlink:href';
-              if (isLink) {
-                var unsafe = BLOCKED_PROTOCOLS.some(function (protocol) {
-                  return value.indexOf(protocol) === 0;
-                });
-                if (unsafe) element.removeAttribute(attribute.name);
+              snapshot.forEach(function (attribute) {
+                var name = String(attribute.name || '').toLowerCase();
+                var value = String(attribute.value || '').trim().toLowerCase();
+
+                if (name.indexOf('on') === 0 || name === 'srcdoc' || name === 'formaction') {
+                  element.removeAttribute(attribute.name);
+                  return;
+                }
+
+                var isLink = name === 'href' || name === 'src' || name === 'xlink:href';
+                if (isLink) {
+                  var unsafe = BLOCKED_PROTOCOLS.some(function (protocol) {
+                    return value.indexOf(protocol) === 0;
+                  });
+                  if (unsafe) element.removeAttribute(attribute.name);
+                }
+              });
+
+              if (element.tagName === 'A') {
+                element.setAttribute('target', '_blank');
+                element.setAttribute('rel', 'noopener noreferrer nofollow');
+              }
+              if (element.tagName === 'IMG') {
+                element.setAttribute('loading', 'lazy');
               }
             });
 
-            if (element.tagName === 'A') {
-              element.setAttribute('target', '_blank');
-              element.setAttribute('rel', 'noopener noreferrer nofollow');
-            }
-            if (element.tagName === 'IMG') {
-              element.setAttribute('loading', 'lazy');
-            }
-          });
-
-          return doc.body.innerHTML;
+            return doc.body.innerHTML;
+          } catch (error) {
+            return '<p>' + escapeHtml(htmlToText(html)) + '</p>';
+          }
         }
 
         function hasRichMarkup(body) {
@@ -1202,7 +1232,7 @@
               '<div class="flex flex-col items-center justify-center px-6 py-14 text-center">' +
               '<span class="flex h-14 w-14 items-center justify-center rounded-2xl border border-background-700/70 bg-background-800/50 text-2xl text-foreground-500"><i class="ri-inbox-line"></i></span>' +
               '<h3 class="mt-4 font-heading text-sm font-semibold text-foreground-100">Your inbox is empty</h3>' +
-              '<p class="mt-2 max-w-xs text-xs leading-relaxed text-foreground-500">Waiting for your first email. This inbox checks for new messages automatically every ten seconds.</p>' +
+              '<p class="mt-2 max-w-xs text-xs leading-relaxed text-foreground-500">No messages yet. Nothing is generated automatically — mail appears here only when something is actually delivered to this address.</p>' +
               '<button type="button" data-action="refresh" class="mt-5 inline-flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border border-background-700/80 bg-background-800/60 px-4 py-2 text-xs font-semibold text-foreground-200 transition hover:border-primary-500/40 hover:text-primary-200"><i class="ri-refresh-line"></i>Check now</button>' +
               '</div>';
             return;
@@ -1213,7 +1243,9 @@
             var otp = extractOtp(message.subject, message.excerpt);
 
             return (
-              '<div class="group relative flex items-stretch transition hover:bg-background-800/30">' +
+              '<div data-action="open" data-id="' +
+              escapeHtml(message.id) +
+              '" class="group relative flex cursor-pointer items-stretch transition hover:bg-background-800/30">' +
               '<button type="button" data-action="open" data-id="' +
               escapeHtml(message.id) +
               '" class="flex min-w-0 flex-1 cursor-pointer items-start gap-3 p-4 text-left">' +
@@ -1256,6 +1288,22 @@
           el.inboxList.innerHTML = '<div class="divide-y divide-background-800/60">' + rows + '</div>';
         }
 
+        function plainBodyHtml(body) {
+          var text = '';
+
+          try {
+            text = htmlToText(body || '').trim();
+          } catch (error) {
+            text = asText(body || '').replace(/<[^>]*>/g, ' ').trim();
+          }
+
+          return (
+            '<pre class="whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-foreground-300">' +
+            escapeHtml(text || 'This message has no readable body.') +
+            '</pre>'
+          );
+        }
+
         function renderModal() {
           if (!el.modalRoot) return;
 
@@ -1267,10 +1315,20 @@
           }
 
           var sender = parseSender(message.from);
-          var otp = extractOtp(message.subject, message.body);
-          var richAvailable = hasRichMarkup(message.body || '');
-          var view = richAvailable ? state.view : 'plain';
+          var otp = null;
+          var richAvailable = false;
+          var view;
           var bodyHtml;
+
+          try {
+            otp = extractOtp(message.subject, message.body);
+            richAvailable = hasRichMarkup(message.body || '');
+          } catch (error) {
+            otp = null;
+            richAvailable = false;
+          }
+
+          view = richAvailable ? state.view : 'plain';
 
           if (state.detailLoading) {
             bodyHtml =
@@ -1279,13 +1337,15 @@
               '<div class="h-3 w-full animate-pulse rounded bg-background-800/70"></div>' +
               '<div class="h-3 w-5/6 animate-pulse rounded bg-background-800/70"></div>' +
               '</div>';
-          } else if (view === 'rich') {
-            bodyHtml = '<div class="mail-body">' + sanitizeEmailHtml(message.body || '') + '</div>';
           } else {
-            bodyHtml =
-              '<pre class="whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-foreground-300">' +
-              escapeHtml(htmlToText(message.body || '').trim() || 'This message has no readable body.') +
-              '</pre>';
+            try {
+              bodyHtml =
+                view === 'rich'
+                  ? '<div class="mail-body">' + sanitizeEmailHtml(message.body || '') + '</div>'
+                  : plainBodyHtml(message.body || '');
+            } catch (error) {
+              bodyHtml = plainBodyHtml(message.body || '');
+            }
           }
 
           var otpBlock = otp
@@ -1495,6 +1555,8 @@
         }
 
         function openMessage(message) {
+          if (!message || !message.id) return;
+
           state.activeMail = Object.assign({}, message, {
             read: true,
             body:
@@ -1508,12 +1570,24 @@
             return item.id === message.id ? Object.assign({}, item, { read: true }) : item;
           });
 
-          renderAll();
+          try {
+            renderInbox();
+          } catch (error) {
+            /* the list keeps its previous state, the viewer still opens */
+          }
+
+          renderModal();
         }
 
         function closeMessage() {
           state.activeMail = null;
-          renderAll();
+          renderModal();
+
+          try {
+            renderInbox();
+          } catch (error) {
+            /* ignore — the viewer is already closed */
+          }
         }
 
         function removeMessage(id) {
@@ -1651,7 +1725,14 @@
               return item.id === id;
             })[0];
 
-            if (match) openMessage(match);
+            if (!match) return;
+
+            try {
+              openMessage(match);
+            } catch (error) {
+              state.detailLoading = false;
+              showToast('Could not open this message — please try again');
+            }
           });
 
           el.modalRoot.addEventListener('click', function (event) {
@@ -1690,13 +1771,19 @@
           });
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        function start() {
           cacheElements();
           bindEvents();
           boot();
           startTimer();
-        });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', start);
+        } else {
+          start();
+        }
       })();
     </script>
   </body>
- </html>
+  </html>
